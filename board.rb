@@ -1,14 +1,38 @@
 require_relative 'tile.rb'
-require 'byebug'
+require 'colorize'
+#require 'byebug'
 
 class MS_Board
 
-  attr_reader :grid, :visited_positions
+  def self.num_display_list
+    num_display_list = (0..8).to_a.map! { |index| " #{index} |" }
+    num_display_list[0] = "   |".colorize(:color => :light_white, :background => :light_white)
+    num_display_list
+  end
 
-  def initialize(size_x = 10, size_y = 10)
+  def self.tile_display_list
+    pipe = "|".colorize(:color => :light_black, :background => :light_white)
+    tile_display_list = {
+      bomb: " B ".colorize(:color => :black, :background => :red) + pipe,
+      flag: " F ".colorize(:color => :red, :background => :light_white) + pipe,
+      hidden: " * ".colorize(:color => :light_black, :background => :light_white) + pipe,
+      line: "----".colorize(:color => :light_black, :background => :light_white),
+      space: " ".colorize(:color => :light_white, :background => :light_white),
+      pipe: pipe
+    }
+  end
+  TILE_DISPLAY_LIST = MS_Board.tile_display_list
+  NUM_DISPLAY_LIST = MS_Board.num_display_list
+
+  attr_reader :grid
+  attr_accessor :visited_positions
+
+  def initialize(size_x = 10, size_y = 10, num_bombs = 10)
+
     @visited_positions = []
     @grid = Array.new(size_x){Array.new(size_y){MS_Tile.new}}
-    place_bombs(size_x)
+    place_bombs(num_bombs)
+
   end
 
   def [](pos)
@@ -17,15 +41,15 @@ class MS_Board
   end
 
   def render
-    puts " " + ("----" * grid.first.length)
+    puts TILE_DISPLAY_LIST[:space] + (TILE_DISPLAY_LIST[:line] * grid.first.length)
     grid.each_index do |idx|
-      print "|"
+      print TILE_DISPLAY_LIST[:pipe]
       grid.first.each_index do |idy|
         pos = [idx, idy]
         print_pos(pos)
       end
       puts
-      puts " " + ("----" * grid.first.length)
+      puts TILE_DISPLAY_LIST[:space] + (TILE_DISPLAY_LIST[:line] * grid.first.length)
     end
     nil
   end
@@ -37,39 +61,55 @@ class MS_Board
       false
   end
 
+  def make_move(pos, action)
+    if action == :R
+      reveal_pos(pos)
+    else
+      flag_pos(pos)
+    end
+  end
+
+  def flag_pos(pos)
+    tile = self[pos]
+    tile.toggle_flag
+  end
+
   def reveal_pos(pos)
     queue = [pos]
-
+    visited_positions << pos
     until queue.empty?
-
       current_pos = queue.shift
-      visited_positions << current_pos
       current_tile = self[current_pos]
       unless current_tile.flagged
         current_tile.reveal
         unless num_adjacent_bombs(current_pos) > 0
-          adjacent_positions = adjacent_positions(current_pos)
-          queue += adjacent_positions.reject{ |adj_pos| visited_positions.include?(adj_pos) }
+          adjacents = adjacent_non_visited(current_pos)
+          queue += adjacents
+          self.visited_positions += adjacents
         end
       end
     end
+  end
 
-end
+  def adjacent_non_visited(pos)
+    adjacent_positions(pos).reject{ |adj_pos| visited_positions.include?(adj_pos) }
+  end
 
   def print_pos(pos)
     tile = self[pos]
 
-    display_list = (0..8).to_a.map! { |index| " #{index} |" }
-    display_list[0] = "   |"
-
     num_adjacent_bombs = num_adjacent_bombs(pos)
     if !tile.revealed
-      print " * |"
+      if tile.flagged
+        print TILE_DISPLAY_LIST[:flag]
+      else
+        print TILE_DISPLAY_LIST[:hidden]
+      end
     else
       if tile.is_bomb
-        print " B |"
+        print TILE_DISPLAY_LIST[:bomb]
       else
-        print display_list[num_adjacent_bombs]
+        print NUM_DISPLAY_LIST[num_adjacent_bombs]
       end
     end
   end
@@ -126,9 +166,4 @@ end
     grid.flatten.any? { |tile| tile.is_bomb && tile.revealed }
   end
 
-end
-
-if $PROGRAM_NAME == __FILE__
-  b = MS_Board.new
-  b.render
 end

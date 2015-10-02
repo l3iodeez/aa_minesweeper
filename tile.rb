@@ -12,4 +12,8 @@ class MS_Tile
     @revealed = true
   end
 
+  def toggle_flag
+    @flagged = !@flagged
+  end
+
 end
