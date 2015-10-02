@@ -1,6 +1,6 @@
 class MS_Tile
-  attr_accessor :flagged
-  attr_reader :is_bomb, :revealed
+  attr_accessor :flagged, :is_bomb, :revealed
+  #attr_reader :revealed
 
   def initialize
     @is_bomb = false
