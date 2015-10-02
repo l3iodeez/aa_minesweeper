@@ -27,14 +27,14 @@ class MS_Board
 
 
   attr_reader :grid
-  attr_accessor :visited_positions
+  attr_accessor :visited_positions, :cursor_pos
 
   def initialize(size_x = 10, size_y = 10, num_bombs = 10)
 
     @visited_positions = []
     @grid = Array.new(size_x){Array.new(size_y){MS_Tile.new}}
     place_bombs(num_bombs)
-
+    @cursor_pos = [0,0]
   end
 
   def [](pos)
@@ -64,7 +64,7 @@ class MS_Board
   end
 
   def make_move(pos, action)
-    if action == :R
+    if action == :r
       reveal_pos(pos)
     else
       flag_pos(pos)
@@ -98,24 +98,32 @@ class MS_Board
   end
 
   def print_pos(pos)
+
+
     tile = self[pos]
 
     num_adjacent_bombs = num_adjacent_bombs(pos)
     if !tile.revealed
       if tile.flagged
-        print TILE_DISPLAY_LIST[:flag]
+        print cursor(TILE_DISPLAY_LIST[:flag],pos)
       else
-        print TILE_DISPLAY_LIST[:hidden]
+        print cursor(TILE_DISPLAY_LIST[:hidden],pos)
       end
     else
       if tile.is_bomb
-        print TILE_DISPLAY_LIST[:bomb]
+        print cursor(TILE_DISPLAY_LIST[:bomb],pos)
       else
-        print TILE_DISPLAY_LIST[num_adjacent_bombs]
+        print cursor(TILE_DISPLAY_LIST[num_adjacent_bombs],pos)
       end
     end
   end
-
+  def cursor(clr_string,pos)
+    if pos == cursor_pos
+      clr_string.colorize(:background => :black)
+    else
+      clr_string
+    end
+  end
   def num_adjacent_bombs(pos)
     adjacent_positions(pos).select { |adj_pos| self[adj_pos].is_bomb }.length
   end
