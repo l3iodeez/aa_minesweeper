@@ -4,25 +4,27 @@ require 'colorize'
 
 class MS_Board
 
-  def self.num_display_list
-    num_display_list = (0..8).to_a.map! { |index| " #{index} |" }
-    num_display_list[0] = "   |".colorize(:color => :light_white, :background => :light_white)
-    num_display_list
-  end
-
   def self.tile_display_list
     pipe = "|".colorize(:color => :light_black, :background => :light_white)
     tile_display_list = {
-      bomb: " B ".colorize(:color => :black, :background => :red) + pipe,
-      flag: " F ".colorize(:color => :red, :background => :light_white) + pipe,
-      hidden: " * ".colorize(:color => :light_black, :background => :light_white) + pipe,
-      line: "----".colorize(:color => :light_black, :background => :light_white),
-      space: " ".colorize(:color => :light_white, :background => :light_white),
-      pipe: pipe
+      0 => "   ".colorize(:color => :light_white, :background => :light_white) + pipe,
+      1 => " 1 ".colorize(:color => :blue, :background => :light_white) + pipe,
+      2 => " 2 ".colorize(:color => :green, :background => :light_white) + pipe,
+      3 => " 3 ".colorize(:color => :light_magenta, :background => :light_white) + pipe,
+      4 => " 4 ".colorize(:color => :magenta, :background => :light_white) + pipe,
+      5 => " 5 ".colorize(:color => :light_red, :background => :light_white) + pipe,
+      7 => " 7 ".colorize(:color => :red, :background => :light_white) + pipe,
+      8 => " 8 ".colorize(:color => :black, :background => :light_white) + pipe,
+      :bomb => " B ".colorize(:color => :black, :background => :red) + pipe,
+      :flag => " F ".colorize(:color => :red, :background => :light_white) + pipe,
+      :hidden => " * ".colorize(:color => :light_black, :background => :light_white) + pipe,
+      :line => "----".colorize(:color => :light_black, :background => :light_white),
+      :space => " ".colorize(:color => :light_white, :background => :light_white),
+      :pipe => pipe
     }
   end
   TILE_DISPLAY_LIST = MS_Board.tile_display_list
-  NUM_DISPLAY_LIST = MS_Board.num_display_list
+
 
   attr_reader :grid
   attr_accessor :visited_positions
@@ -109,7 +111,7 @@ class MS_Board
       if tile.is_bomb
         print TILE_DISPLAY_LIST[:bomb]
       else
-        print NUM_DISPLAY_LIST[num_adjacent_bombs]
+        print TILE_DISPLAY_LIST[num_adjacent_bombs]
       end
     end
   end
