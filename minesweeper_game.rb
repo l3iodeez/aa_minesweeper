@@ -1,5 +1,5 @@
 require_relative './board'
-require 'YAML'
+require 'yaml'
 require_relative './keypress'
 require 'byebug'
 
