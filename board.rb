@@ -105,21 +105,23 @@ class MS_Board
     num_adjacent_bombs = num_adjacent_bombs(pos)
     if !tile.revealed
       if tile.flagged
-        print cursor(TILE_DISPLAY_LIST[:flag],pos) + TILE_DISPLAY_LIST[:pipe]
+        print cursor(TILE_DISPLAY_LIST[:flag],pos)
       else
-        print cursor(TILE_DISPLAY_LIST[:hidden],pos) + TILE_DISPLAY_LIST[:pipe]
+        print cursor(TILE_DISPLAY_LIST[:hidden],pos)
       end
     else
       if tile.is_bomb
-        print cursor(TILE_DISPLAY_LIST[:bomb],pos) + TILE_DISPLAY_LIST[:pipe]
+        print cursor(TILE_DISPLAY_LIST[:bomb],pos)
       else
-        print cursor(TILE_DISPLAY_LIST[num_adjacent_bombs],pos) + TILE_DISPLAY_LIST[:pipe]
+        print cursor(TILE_DISPLAY_LIST[num_adjacent_bombs],pos) 
       end
     end
+    print TILE_DISPLAY_LIST[:pipe]
+    
   end
   def cursor(clr_string,pos)
     if pos == cursor_pos
-      clr_string.colorize(:mode => :swap)
+      clr_string.white.on_black.blink
     else
       clr_string
     end
@@ -141,6 +143,10 @@ class MS_Board
       [1,-1],
     ]
     deltas.map { |e| [x + e.first, y + e.last] }.reject {|pos| out_of_bounds?(pos)}
+  end
+  def reveal_bombs
+    bombs = grid.flatten.select { |tile| tile.is_bomb }
+    bombs.each { |tile| tile.reveal }
   end
 
   def bomb_count

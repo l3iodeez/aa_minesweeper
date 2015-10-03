@@ -4,7 +4,7 @@ require_relative './keypress'
 require 'byebug'
 
 class MineSweeperGame
-  attr_reader :board
+  attr_reader :board, :difficulty
 
   def initialize
     difficulties = {
@@ -14,12 +14,12 @@ class MineSweeperGame
       3 => [16,30,99]
     }
     system('clear')
-    diff_choice  = get_difficulty
-    if diff_choice.downcase == "l"
+    @difficulty = get_difficulty
+    if difficulty.downcase == "l"
       @board = load_game
     else
-      diff_choice = diff_choice.to_i
-      settings = difficulties[diff_choice]
+      @difficulty = difficulty.to_i
+      settings = difficulties[difficulty]
       @board = MS_Board.new(*settings)
     end
     play_game
@@ -34,30 +34,30 @@ class MineSweeperGame
   end
 
   def play_game
+    keep_playing = false
+
     until board.over?
       draw_screen
+      give_instructions
       key_pressed = nil
       until key_pressed == "RETURN" || key_pressed == "SPACE" || key_pressed == "ESCAPE"
          key_pressed = show_single_key
-        # debugger
-         case key_pressed
-
+        case key_pressed
            when "UP ARROW"
-             board.cursor_pos[0] -=1 unless board.cursor_pos[0] == 0
+             board.cursor_pos[0] -=1 unless board.out_of_bounds?(board.cursor_pos[0] - 1)
            when "DOWN ARROW"
-             board.cursor_pos[0] +=1 unless board.cursor_pos[0] == board.grid.length - 1
+             board.cursor_pos[0] +=1 unless board.out_of_bounds?(board.cursor_pos[0] + 1)
            when "LEFT ARROW"
-             board.cursor_pos[1] -=1 unless board.cursor_pos[1] == 0
+             board.cursor_pos[1] -=1 unless board.out_of_bounds?(board.cursor_pos[1] - 1)
            when "RIGHT ARROW"
-             board.cursor_pos[1] +=1  unless board.cursor_pos[1] == board.grid.length - 1
+             board.cursor_pos[1] +=1  unless board.out_of_bounds?(board.cursor_pos[1] + 1)
            when "TAB"
              save_game
            when "ESCAPE"
              abort
-           else
-             puts board.cursor_pos
-         end
+        end
          draw_screen
+         give_instructions
       end
 
       pos = board.cursor_pos
@@ -71,34 +71,26 @@ class MineSweeperGame
 
       board.make_move(pos, action)
     end
-    system('clear')
-    board.render
+    board.reveal_bombs
+    draw_screen
     if board.won?
-      puts "YOU ROCK"
+      puts "YOU ROCK!!"
     else
-      puts "YOU SUCK"
+      puts "Tough luck."
     end
-    
+
+
   end
 
   def draw_screen
     system('clear')
     board.render
+  end
+  def give_instructions
     puts "Use arrow keys to select a position."
     puts "Press Enter to reveal a position"
-    puts "Press space to flag a position"
-    puts "Press S to save game or ESC to quit."
-  end
-
-  def get_pos
-
-    #input = gets.chomp
-    # save_game if input.downcase == "save"
-    #
-    # until parse(input).length == 2
-    #   input = gets.chomp
-    # end
-    # parse(input)
+    puts "Press Space to flag a position"
+    puts "Press Tab to save game or ESC to quit."
   end
 
   def save_game
