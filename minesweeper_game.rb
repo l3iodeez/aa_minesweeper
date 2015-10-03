@@ -44,13 +44,13 @@ class MineSweeperGame
          key_pressed = show_single_key
         case key_pressed
            when "UP ARROW"
-             board.cursor_pos[0] -=1 unless board.out_of_bounds?(board.cursor_pos[0] - 1)
+             board.cursor_pos[0] -=1 unless out_of_bounds?([cursor_pos.first - 1, cursor_pos.last])
            when "DOWN ARROW"
-             board.cursor_pos[0] +=1 unless board.out_of_bounds?(board.cursor_pos[0] + 1)
+             board.cursor_pos[0] +=1 unless out_of_bounds?([cursor_pos.first + 1, cursor_pos.last])
            when "LEFT ARROW"
-             board.cursor_pos[1] -=1 unless board.out_of_bounds?(board.cursor_pos[1] - 1)
+             board.cursor_pos[1] -=1 unless out_of_bounds?([cursor_pos.first, cursor_pos.last - 1])
            when "RIGHT ARROW"
-             board.cursor_pos[1] +=1  unless board.out_of_bounds?(board.cursor_pos[1] + 1)
+             board.cursor_pos[1] +=1  unless out_of_bounds?([cursor_pos.first, cursor_pos.last + 1])
            when "TAB"
              save_game
            when "ESCAPE"
@@ -80,6 +80,12 @@ class MineSweeperGame
     end
 
 
+  end
+  def cursor_pos
+    board.cursor_pos
+  end
+  def out_of_bounds?(pos)
+    board.out_of_bounds?(pos)
   end
 
   def draw_screen

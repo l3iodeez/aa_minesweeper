@@ -57,6 +57,7 @@ class MS_Board
   end
 
   def out_of_bounds?(pos)
+    
       x, y = pos
       return true unless x.between?(0, grid.length - 1)
       return true unless y.between?(0, grid.first.length - 1)
