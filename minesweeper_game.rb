@@ -43,13 +43,13 @@ class MineSweeperGame
          case key_pressed
 
            when "UP ARROW"
-             board.cursor_pos[0] -=1
+             board.cursor_pos[0] -=1 unless board.cursor_pos[0] == 0
            when "DOWN ARROW"
-             board.cursor_pos[0] +=1
+             board.cursor_pos[0] +=1 unless board.cursor_pos[0] == board.grid.length - 1
            when "LEFT ARROW"
-             board.cursor_pos[1] -=1
+             board.cursor_pos[1] -=1 unless board.cursor_pos[1] == 0
            when "RIGHT ARROW"
-             board.cursor_pos[1] +=1
+             board.cursor_pos[1] +=1  unless board.cursor_pos[1] == board.grid.length - 1
            when "TAB"
              save_game
            when "ESCAPE"
@@ -71,16 +71,23 @@ class MineSweeperGame
 
       board.make_move(pos, action)
     end
+    system('clear')
+    board.render
     if board.won?
       puts "YOU ROCK"
     else
       puts "YOU SUCK"
     end
+    
   end
 
   def draw_screen
     system('clear')
     board.render
+    puts "Use arrow keys to select a position."
+    puts "Press Enter to reveal a position"
+    puts "Press space to flag a position"
+    puts "Press S to save game or ESC to quit."
   end
 
   def get_pos

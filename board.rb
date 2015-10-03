@@ -5,22 +5,22 @@ require 'colorize'
 class MS_Board
 
   def self.tile_display_list
-    pipe = "|".colorize(:color => :light_black, :background => :light_white)
+    pipe = 
     tile_display_list = {
-      0 => "   ".colorize(:color => :light_white, :background => :light_white) + pipe,
-      1 => " 1 ".colorize(:color => :blue, :background => :light_white) + pipe,
-      2 => " 2 ".colorize(:color => :green, :background => :light_white) + pipe,
-      3 => " 3 ".colorize(:color => :light_magenta, :background => :light_white) + pipe,
-      4 => " 4 ".colorize(:color => :magenta, :background => :light_white) + pipe,
-      5 => " 5 ".colorize(:color => :light_red, :background => :light_white) + pipe,
-      7 => " 7 ".colorize(:color => :red, :background => :light_white) + pipe,
-      8 => " 8 ".colorize(:color => :black, :background => :light_white) + pipe,
-      :bomb => " B ".colorize(:color => :black, :background => :red) + pipe,
-      :flag => " F ".colorize(:color => :red, :background => :light_white) + pipe,
-      :hidden => " * ".colorize(:color => :light_black, :background => :light_white) + pipe,
+      0 => "   ".colorize(:color => :light_white, :background => :light_white),
+      1 => " 1 ".colorize(:color => :blue, :background => :light_white),
+      2 => " 2 ".colorize(:color => :green, :background => :light_white),
+      3 => " 3 ".colorize(:color => :light_magenta, :background => :light_white),
+      4 => " 4 ".colorize(:color => :magenta, :background => :light_white),
+      5 => " 5 ".colorize(:color => :light_red, :background => :light_white),
+      7 => " 7 ".colorize(:color => :red, :background => :light_white),
+      8 => " 8 ".colorize(:color => :black, :background => :light_white),
+      :bomb => " B ".colorize(:color => :black, :background => :red),
+      :flag => " F ".colorize(:color => :red, :background => :light_white),
+      :hidden => " * ".colorize(:color => :light_black, :background => :light_white),
       :line => "----".colorize(:color => :light_black, :background => :light_white),
       :space => " ".colorize(:color => :light_white, :background => :light_white),
-      :pipe => pipe
+      :pipe => "|".colorize(:color => :light_black, :background => :light_white)
     }
   end
   TILE_DISPLAY_LIST = MS_Board.tile_display_list
@@ -105,21 +105,21 @@ class MS_Board
     num_adjacent_bombs = num_adjacent_bombs(pos)
     if !tile.revealed
       if tile.flagged
-        print cursor(TILE_DISPLAY_LIST[:flag],pos)
+        print cursor(TILE_DISPLAY_LIST[:flag],pos) + TILE_DISPLAY_LIST[:pipe]
       else
-        print cursor(TILE_DISPLAY_LIST[:hidden],pos)
+        print cursor(TILE_DISPLAY_LIST[:hidden],pos) + TILE_DISPLAY_LIST[:pipe]
       end
     else
       if tile.is_bomb
-        print cursor(TILE_DISPLAY_LIST[:bomb],pos)
+        print cursor(TILE_DISPLAY_LIST[:bomb],pos) + TILE_DISPLAY_LIST[:pipe]
       else
-        print cursor(TILE_DISPLAY_LIST[num_adjacent_bombs],pos)
+        print cursor(TILE_DISPLAY_LIST[num_adjacent_bombs],pos) + TILE_DISPLAY_LIST[:pipe]
       end
     end
   end
   def cursor(clr_string,pos)
     if pos == cursor_pos
-      clr_string.colorize(:background => :black)
+      clr_string.colorize(:mode => :swap)
     else
       clr_string
     end
@@ -130,7 +130,7 @@ class MS_Board
 
   def adjacent_positions(pos)
     x, y = pos
-    vectors = [
+    deltas = [
       [0,1],
       [1,1],
       [1,0],
@@ -140,7 +140,7 @@ class MS_Board
       [-1,1],
       [1,-1],
     ]
-    vectors.map { |e| [x + e.first, y + e.last] }.reject {|pos| out_of_bounds?(pos)}
+    deltas.map { |e| [x + e.first, y + e.last] }.reject {|pos| out_of_bounds?(pos)}
   end
 
   def bomb_count
